@@ -14,6 +14,8 @@ public enum Database {
     public ArrayList<Item> items = new ArrayList<>();
 
     public void init(String dataFilePath) {
+        // add this line to run the initialisation before each test
+        items = new ArrayList<>();
         try (Stream<String> stream = Files.lines(Paths.get(dataFilePath))) {
             stream.skip(1).forEach(line -> {
                 String[] data = line.split(";");
