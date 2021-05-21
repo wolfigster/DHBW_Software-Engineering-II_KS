@@ -1,7 +1,7 @@
 package crossover;
 
 import base.Knapsack;
-import random.MersenneTwisterFast;
+import configuration.Configuration;
 
 import java.util.ArrayList;
 import java.util.stream.IntStream;
@@ -10,10 +10,9 @@ import java.util.stream.IntStream;
 // if needed -> please update "Placeholder" with the name of the implemented algorithm
 public class KPointCrossover extends Crossover {
     public ArrayList<Knapsack> doCrossover(Knapsack knapsack01, Knapsack knapsack02) {
-        MersenneTwisterFast mersenneTwisterFast = new MersenneTwisterFast();
         // randomly select k crossover points
-        int k = mersenneTwisterFast.nextInt(knapsack01.getStructure().size()-1);
-        int[] points = mersenneTwisterFast.ints(1, knapsack01.getStructure().size()-1).distinct().limit(k).toArray();
+        int k = Configuration.instance.randomNumberGenerator.nextInt(knapsack01.getStructure().size()-1);
+        int[] points = Configuration.instance.randomNumberGenerator.ints(1, knapsack01.getStructure().size()-1).distinct().limit(k).toArray();
 
         ArrayList<Integer> child01 = new ArrayList<>();
         ArrayList<Integer> child02 = new ArrayList<>();
