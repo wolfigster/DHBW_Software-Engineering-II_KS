@@ -31,31 +31,35 @@ public class TestKPointCrossover {
     private Crossover crossover;
     private Knapsack parent01;
     private Knapsack parent02;
-    private int maxVolume = 822;
+    private final int maxVolume = 822;
 
     @BeforeEach
     public void init() {
         Database.instance.init(Configuration.instance.dataFilePath);
 
         this.crossover = new KPointCrossover();
-        this.parent01 = new Knapsack();
-        this.parent02 = new Knapsack();
+        this.parent01 = createTestParent();
+        this.parent02 = createTestParent();
+    }
 
-        ArrayList<Integer> structure01 = new ArrayList<>();
-        ArrayList<Integer> structure02 = new ArrayList<>();
+    private Knapsack createTestParent() {
+        Knapsack parent = new Knapsack();
+        ArrayList<Integer> position = new ArrayList<>();
+        ArrayList<Integer> structure = new ArrayList<>();
 
         for(int i = 1; i <= 150; i++) {
-            structure01.add(i);
-            structure02.add(i);
+            position.add(i);
+            structure.add(0);
         }
 
-        Collections.shuffle(structure02);
-        parent01.setStructure(structure01);
-        parent02.setStructure(structure02);
-        System.out.println(parent01.getTotalValue());
-        System.out.println(parent01.getTotalVolume());
-        System.out.println(parent02.getTotalValue());
-        System.out.println(parent02.getTotalVolume());
+        Collections.shuffle(position);
+        position.forEach(index -> {
+            if (parent.getTotalVolume() <= maxVolume) {
+                structure.set(index-1, 1);
+                parent.setStructure(structure);
+            }
+        });
+        return parent;
     }
 
     @Test
@@ -107,13 +111,22 @@ public class TestKPointCrossover {
     @Test
     @DisplayName("[07] child is valid related to knapsack restriction")
     public void test07() {
-        // which knapsack restriction? max volume of 822
+        ArrayList<Knapsack> child = crossover.doCrossover(parent01, parent02);
+        child.removeIf(c -> c.getTotalVolume() >= maxVolume);
+        child.forEach(c -> Assertions.assertTrue(c.getTotalVolume() <= maxVolume));
     }
 
     @Test
     @DisplayName("[08] child contains not only 0s and not only 1s")
     public void test08() {
-        // knapsack looks complete different
+        ArrayList<Knapsack> child = crossover.doCrossover(parent01, parent02);
+        ArrayList<Integer> child01 = child.get(0).getStructure();
+        ArrayList<Integer> child02 = child.get(1).getStructure();
+
+        Assertions.assertTrue(child01.contains(0));
+        Assertions.assertTrue(child02.contains(0));
+        Assertions.assertTrue(child01.contains(1));
+        Assertions.assertTrue(child02.contains(1));
     }
 
     @Test
